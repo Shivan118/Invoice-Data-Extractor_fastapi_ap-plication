@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Gemini Application</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Gemini Application</h1>
+        <form action="/submit/" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="input_text">Input Prompt:</label>
+                <textarea class="form-control" id="input_text" name="input_text" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="upload_file">Choose an image file to upload:</label>
+                <input type="file" class="form-control-file" id="upload_file" name="upload_file" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit your query</button>
+        </form>
+        <div id="response" class="mt-3"></div>
+    </div>
+
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();  // Prevent default form submission
+            const formData = new FormData(form);
+            console.log("Submitting form data...");  // Log when submitting
+            const responseDiv = document.getElementById('response');
+
+            try {
+                const response = await fetch('/submit/', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                console.log("Received response:", result);  // Log received response
+
+                if (result.error) {
+                    responseDiv.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                } else {
+                    responseDiv.innerHTML = `<div class="alert alert-success"><strong>Response:</strong> ${result.response}</div>`;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);  // Log fetch errors
+                responseDiv.innerHTML = `<div class="alert alert-danger">An error occurred while processing your request.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
